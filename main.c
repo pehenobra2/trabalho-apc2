@@ -3,12 +3,29 @@
 #include <string.h>
 #include <locale.h>
 
-#define tam 1000
+#define tam 60
+
+typedef struct estado{
+    int id;
+    char nome[tam];
+}estado;
+
+typedef struct curso{
+    int id;
+    char nome[tam]
+}curso;
+
+typedef struct pessoa{
+
+        char nome[tam];
+        int idade, sexo, id_estado, id_curso;
+
+}pessoa;
 
 void menu();
-void cadastra_estado(char estado[], FILE *f1);
+void cadastra_estado();
 void cadastra_curso(char curso[], FILE *f2);
-void cadastra_pessoa(char nome[], char sexo[], int idade, FILE *f3);
+void cadastra_pessoa(char nome[], int sexo, int idade, FILE *f3);
 
 int main (){
 
@@ -17,14 +34,10 @@ int main (){
     FILE *f1, *f2, *f3;
 
 
-    struct dados{
+    pessoa pessoa;
+    estado estado;
+    curso curso;
 
-        char nome[tam], estado[tam], curso[tam], sexo[tam];
-        int idade;
-
-    };
-
-    struct dados pessoas;
 
     do{
         menu();
@@ -40,16 +53,16 @@ int main (){
         }
 
         if(opcoes == 1){
-                cadastra_estado(pessoas.estado, f1);
+                cadastra_estado();
 
         }
         if(opcoes == 2){
-                cadastra_curso(pessoas.curso, f2);
+                cadastra_curso(curso.nome, f2);
 
         }
 
         if(opcoes == 3){
-                cadastra_pessoa(pessoas.nome, pessoas.sexo, pessoas.idade, f3);
+                cadastra_pessoa(pessoa.nome, pessoa.sexo, pessoa.idade, f3);
 
         }
         if(opcoes == 4){
@@ -68,6 +81,7 @@ int main (){
 
     }while(opcoes != 8);
 
+    return 0;
 }
 
 void menu(){
@@ -76,23 +90,34 @@ void menu(){
 
 }
 
-void cadastra_estado(char estado[], FILE *f1){
+void cadastra_estado(){
+
+    FILE *f1;
+
+    estado novo;
+    int id_arquivo=1;
 
     printf("Digite o estado: ");
     getchar();
-    scanf("%[^\n]s", estado);
+    scanf("%[^\n]s", novo.nome);
+    f1 = fopen("estados", "a+b");
 
-    f1 = fopen("estados.txt", "a+t");
 
-    if(f1 == NULL){
-        printf("ERRO NA ABERTURA DO ARQUIVO!\n");
-        system("pause");
-        exit(1);
+    if(ftell(f1) ==0){
+        novo.id = id_arquivo;
+    }
+    else
+    {
+        fseek(f1, -64, SEEK_END);
+        fread(&id_arquivo, sizeof(int), 1, f1);
+        novo.id = id_arquivo +1;
+        fseek(f1, 0, SEEK_END);
     }
 
-    fprintf(f1, "%s", estado);
+    fwrite(&novo, sizeof(estado), 1, f1);
 
     fclose(f1);
+
 
     printf("__________________________\n");
 
@@ -105,7 +130,7 @@ void cadastra_curso(char curso[], FILE *f2){
     scanf("%[^\n]s", curso);
 
 
-    f2 = fopen("cursos.txt", "a+t");
+    f2 = fopen("cursos.txt", "a+b");
 
     if(f2 == NULL){
         printf("ERRO NA ABERTURA DO ARQUIVO!\n");
@@ -121,13 +146,13 @@ void cadastra_curso(char curso[], FILE *f2){
 
 }
 
-void cadastra_pessoa(char nome[], char sexo[], int idade, FILE *f3){
+void cadastra_pessoa(char nome[], int sexo, int idade, FILE *f3){
 
     getchar();
     printf("Digite o nome: ");
     fgets(nome, tam, stdin);
     printf("Digite o sexo: ");
-    fgets(sexo, tam, stdin);
+    scanf("%d", &sexo);
     printf("Digite a idade: ");
     scanf("%d", &idade);
 
@@ -138,7 +163,7 @@ void cadastra_pessoa(char nome[], char sexo[], int idade, FILE *f3){
     }
 
 
-    f3 = fopen("pessoa.txt", "a+t");
+    f3 = fopen("pessoa.txt", "a+b");
 
     if(f3 == NULL){
         printf("ERRO NA ABERTURA DO ARQUIVO!\n");
